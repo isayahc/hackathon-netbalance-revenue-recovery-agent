@@ -14,6 +14,13 @@ export type PrismStage =
   | "outcome_verification"
   | "completion_evaluation";
 
+export { verifyEvidence } from "./evidence-gate";
+export type {
+  EvidenceVerificationInput,
+  EvidenceVerificationResult,
+  PowerFailoverEvidence,
+} from "./evidence-gate";
+
 export type PrismTraceEvent = {
   sessionId: string;
   stage: PrismStage;
