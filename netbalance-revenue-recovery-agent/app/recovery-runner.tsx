@@ -12,8 +12,9 @@ import {
 } from "@phosphor-icons/react";
 
 import type { CompletionCondition } from "@/config/demo";
+import { atlasScenario } from "@/config/scenario";
 import { evaluateCompletion, type RecoveryAnalysis } from "@/lib/agent";
-import type { PrismStage } from "@/lib/prism";
+import type { EvidenceVerificationResult, PrismStage } from "@/lib/prism";
 
 type RunEvent = {
   id: string;
@@ -76,7 +77,7 @@ export function RecoveryRunner({ initialAnalysis, completionCondition, targetRec
     setOutcome(null);
     setPrismStatus("pending");
     setState("running");
-    const runSessionId = `NB-10482-${crypto.randomUUID().slice(0, 8)}`;
+    const runSessionId = `${atlasScenario.caseId}-${crypto.randomUUID().slice(0, 8)}`;
     setSessionId(runSessionId);
 
     const trace = async (
@@ -110,7 +111,42 @@ export function RecoveryRunner({ initialAnalysis, completionCondition, targetRec
         throw new Error(analysis.blockers.join(" ") || "The case is not eligible for automatic recovery.");
       }
 
-      await trace("document_ingestion", "Eight source PDFs parsed and normalized into 15 sourced fields.", { documents_parsed: 8 });
+      const verifyEvidence = (powerFailoverReport?: {
+        backupPowerActivated: boolean;
+        serviceOperational: boolean;
+        slaBreached: boolean;
+      }) => jsonRequest<EvidenceVerificationResult>("/api/prism/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          caseId: atlasScenario.caseId,
+          customer: atlasScenario.customer,
+          incident: atlasScenario.incident,
+          deductionAmount: atlasScenario.deductionAmount,
+          outageConfirmed: true,
+          powerFailoverReport,
+        }),
+        signal: controller.signal,
+      });
+
+      const initialVerification = await verifyEvidence();
+      append({ id: "prism-evidence-insufficient", label: "PRISM evidence gate blocked action", detail: `${initialVerification.reason} Missing evidence: ${initialVerification.missingEvidence.join(", ")}.`, status: "info" });
+      await trace("evidence_verification", `Evidence insufficient. Missing evidence: ${initialVerification.missingEvidence.join(", ")}.`, { evidence_sufficient: false, missing_evidence: initialVerification.missingEvidence.join(", ") });
+      await wait(controller.signal);
+
+      const completeVerification = await verifyEvidence({
+        backupPowerActivated: true,
+        serviceOperational: true,
+        slaBreached: false,
+      });
+      if (!completeVerification.decisionSupported) {
+        throw new Error(completeVerification.reason);
+      }
+      append({ id: "prism-evidence-sufficient", label: "PRISM evidence gate passed", detail: "Backup power activated, service remained operational, and the SLA was not breached.", status: "passed" });
+      await trace("evidence_verification", completeVerification.reason, { evidence_sufficient: true, decision_supported: true, decision: completeVerification.decision });
+      await wait(controller.signal);
+
+      await trace("document_ingestion", "Outage records parsed and normalized into sourced fields.", { documents_parsed: 8 });
       await trace("evidence_reconciliation", "Retailer records 1,220 cases; ASN, BOL, and signed POD verify 1,460 delivered.", { retailer_cases: 1220, delivered_cases: 1460, disputed_cases: 240 });
       await trace("dispute_decision", "The $42,800 shortage deduction is eligible for dispute with high confidence.", { eligible: true, decision: "dispute" });
 
