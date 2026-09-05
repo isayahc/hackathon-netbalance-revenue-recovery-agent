@@ -1,0 +1,23 @@
+{
+  "name": "cfo-voice-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A Twilio phone assistant that consults an OpenAI Controller and speaks with ElevenLabs.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test",
+    "demo": "node scripts/demo.js",
+    "call": "node scripts/call.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "openai": "^7.10.0",
+    "twilio": "^5.13.1"
+  }
+}

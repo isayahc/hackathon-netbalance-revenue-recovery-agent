@@ -1,0 +1,32 @@
+# This Blueprint assumes voiceAgent is the repository root.
+# If deploying the parent repository, add rootDir: voiceAgent to this service.
+# The paid instance below avoids idle spin-down during incoming phone calls.
+services:
+  - type: web
+    name: cfo-voice-agent
+    runtime: node
+    plan: 0.5c-512mb
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OPENAI_MODEL
+        value: gpt-5.4-mini
+      - key: CONTROLLER_MODEL
+        value: gpt-5.4-mini
+      - key: ELEVENLABS_MODEL_ID
+        value: eleven_flash_v2_5
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_VOICE_ID
+        sync: false
