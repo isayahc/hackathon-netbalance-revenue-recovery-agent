@@ -1,0 +1,40 @@
+{
+  "dataLabel": "Synthetic demo financial data for fictional ExampleCo",
+  "period": "2026-08",
+  "currency": "USD",
+  "openingCash": {
+    "sourceId": "cash-opening",
+    "amount": 1200000,
+    "note": "Cash at the start of August 2026."
+  },
+  "movements": [
+    { "sourceId": "cash-receipts", "amount": 500000, "note": "Customer cash receipts collected during August." },
+    { "sourceId": "cash-suppliers", "amount": -380000, "note": "Cash payments to suppliers during August." },
+    { "sourceId": "cash-payroll", "amount": -240000, "note": "Cash payments for payroll during August." },
+    { "sourceId": "cash-equipment", "amount": -120000, "note": "A one-time equipment purchase paid during August." },
+    { "sourceId": "cash-tax", "amount": -40000, "note": "Cash tax payments during August." }
+  ],
+  "closingCash": {
+    "sourceId": "cash-closing",
+    "amount": 920000,
+    "note": "Cash at the end of August 2026."
+  },
+  "contextFacts": [
+    {
+      "sourceId": "receipt-delay",
+      "amount": 180000,
+      "note": "A customer payment expected in August was delayed until September. It is excluded from August's $500,000 of actual receipts. This is a timing shortfall against expected receipts, not another cash outflow and not an additional deduction from the actual cash bridge. Its actual September collection is not confirmed."
+    },
+    {
+      "sourceId": "equipment-one-time",
+      "note": "The equipment payment in cash-equipment was a one-time purchase. It is already included in the cash bridge."
+    }
+  ],
+  "unavailable": [
+    "Complete cash budget or planned closing cash",
+    "Other months' financial results or current live balances",
+    "Revenue, net income, and a profit-and-loss statement",
+    "Customer identity and the exact delayed payment collection date",
+    "Invoice-level records, bank statements, debt, and credit facilities"
+  ]
+}
