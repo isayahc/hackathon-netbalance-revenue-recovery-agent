@@ -7,7 +7,7 @@ type EvidenceSource = {
 };
 
 export type NormalizedCaseEvidence = {
-  case_id: "NB-10482";
+  case_id: "ATLAS-42800";
   invoice_number: string;
   po_number: string;
   invoice_amount: number;
@@ -77,8 +77,8 @@ export function extractCaseEvidence(input: IngestedDocument[]): NormalizedCaseEv
   const invoiceAmount = amount(invoice.text, "Invoice total");
   const paymentReceived = amount(remittance.text, "Payment issued");
   const deductionAmount = amount(remittance.text, "Deduction amount");
-  const deductionReason = requiredMatch(remittance.text, /Reason\s+(Merchandise Shortage)/i, "deduction reason");
-  const deductionDc = requiredMatch(remittance.text, /Reference\s+(DC \d{3})\s*\/\s*Atlanta/i, "deduction distribution center");
+  const deductionReason = requiredMatch(remittance.text, /Reason\s+(Power Service Interruption)/i, "deduction reason");
+  const deductionDc = requiredMatch(remittance.text, /Reference\s+(Atlas Cloud)\s*\/\s*Atlanta/i, "deduction customer");
   const expectedCases = integer(receiving.text, "Expected quantity", "\\s+cases");
   const retailerReceivedCases = integer(receiving.text, "Received in retailer system", "\\s+cases");
   const asnCases = integer(asn.text, "Cases dispatched");
@@ -101,14 +101,14 @@ export function extractCaseEvidence(input: IngestedDocument[]): NormalizedCaseEv
   if (new Set([expectedCases, asnCases, bolCases, podCases]).size !== 1) {
     validationIssues.push("ASN, BOL, POD, and expected receiving quantities do not agree.");
   }
-  if (!pod.text.includes("Signed by Northstar Receiving")) {
-    validationIssues.push("Proof of Delivery is missing the Northstar receiving signature.");
+  if (!pod.text.includes("Signed by Atlas Cloud Operations")) {
+    validationIssues.push("Incident operations report is missing the Atlas Cloud signature.");
   }
 
   const from = (document: IngestedDocument): EvidenceSource => ({ documentId: document.id, fileName: document.fileName });
 
   return {
-    case_id: "NB-10482",
+    case_id: "ATLAS-42800",
     invoice_number: invoiceNumber,
     po_number: poNumber,
     invoice_amount: invoiceAmount,

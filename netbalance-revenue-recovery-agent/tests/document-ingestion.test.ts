@@ -11,10 +11,10 @@ test("ingests all PDFs and extracts normalized case evidence", async () => {
   assert.ok(documents.every((document) => document.text.length > 200));
   assert.equal(evidence.invoice_number, "INV-10482");
   assert.equal(evidence.po_number, "PO-77191");
-  assert.equal(evidence.invoice_amount, 584200);
-  assert.equal(evidence.payment_received, 541400);
+  assert.equal(evidence.invoice_amount, 268000);
+  assert.equal(evidence.payment_received, 225200);
   assert.equal(evidence.deduction_amount, 42800);
-  assert.equal(evidence.deduction_dc, "DC 027");
+  assert.equal(evidence.deduction_dc, "Atlas Cloud");
   assert.equal(evidence.retailer_received_cases, 1220);
   assert.deepEqual([evidence.asn_cases, evidence.bol_cases, evidence.pod_cases], [1460, 1460, 1460]);
   assert.equal(evidence.seal_number, "S-44719");

@@ -9,7 +9,7 @@ test("recommends a dispute and assembles a complete claim from reconciled eviden
   const analysis = analyzeRecoveryCase(evidence);
 
   assert.equal(analysis.shortPayment, 42800);
-  assert.equal(analysis.affectedDistributionCenter, "DC 027");
+  assert.equal(analysis.affectedDistributionCenter, "Atlas Cloud");
   assert.equal(analysis.reconciliation.disputedCases, 240);
   assert.equal(analysis.reconciliation.externalEvidenceAgrees, true);
   assert.equal(analysis.reconciliation.conflictIdentified, true);

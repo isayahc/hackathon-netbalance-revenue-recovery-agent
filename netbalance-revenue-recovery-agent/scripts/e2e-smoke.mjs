@@ -72,10 +72,10 @@ const evidence = await request(`/api/northstar/claims/${claim.claim_id}/evidence
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    document: "Proof_of_Delivery_DC027.pdf",
-    seal_number: "S-44719",
-    signed_by: "Northstar Receiving",
-    receiver: "J. Reynolds",
+    document: "Power_Failover_Report.pdf",
+    failover_status: "Backup power activated",
+    service_status: "Operational",
+    sla_breached: false,
   }),
 });
 assert.equal(evidence.evidence_verified, true);
