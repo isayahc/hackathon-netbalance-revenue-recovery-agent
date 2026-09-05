@@ -1,6 +1,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import { extname, relative, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
+import { emitTrace } from "./prismtrace.mjs";
 
 const CONTENT_TYPES = {
   ".csv": "text/csv",
@@ -39,28 +40,55 @@ export async function uploadDocument(filePath, { rootDir, ...overrides } = {}) {
     .split(sep)
     .join("/");
   const body = await readFile(absoluteFilePath);
-  const response = await fetch(storageObjectUrl(config, relativePath), {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${config.key}`,
-      apikey: config.key,
-      "Content-Type": CONTENT_TYPES[extname(absoluteFilePath).toLowerCase()] ?? "application/octet-stream",
-      "x-upsert": "true",
-    },
-    body,
-  });
+  const startedAt = performance.now();
+  let response;
+  try {
+    response = await fetch(storageObjectUrl(config, relativePath), {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.key}`,
+        apikey: config.key,
+        "Content-Type": CONTENT_TYPES[extname(absoluteFilePath).toLowerCase()] ?? "application/octet-stream",
+        "x-upsert": "true",
+      },
+      body,
+    });
+  } catch (error) {
+    await emitTrace({
+      input: relativePath,
+      output: "",
+      model: "supabase-storage-upload",
+      latencyMs: performance.now() - startedAt,
+      error: error.message,
+    });
+    throw error;
+  }
 
   if (!response.ok) {
     const details = await response.text();
+    await emitTrace({
+      input: relativePath,
+      output: details,
+      model: "supabase-storage-upload",
+      latencyMs: performance.now() - startedAt,
+      error: `HTTP ${response.status}`,
+    });
     throw new Error(`Supabase upload failed for ${relativePath} (${response.status}): ${details}`);
   }
 
-  return {
+  const result = {
     source: absoluteFilePath,
     bucket: config.bucket,
     path: relativePath,
     url: storageObjectUrl(config, relativePath),
   };
+  await emitTrace({
+    input: relativePath,
+    output: JSON.stringify({ bucket: result.bucket, path: result.path }),
+    model: "supabase-storage-upload",
+    latencyMs: performance.now() - startedAt,
+  });
+  return result;
 }
 
 async function collectFiles(directory) {

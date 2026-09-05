@@ -5,6 +5,6 @@
   "scripts": {
     "search": "node tavily-websearch.mjs",
     "ingest": "node supabase-document-ingest.mjs",
-    "test": "node --test tavily-websearch.test.mjs supabase-document-ingest.test.mjs"
+    "test": "node --test tavily-websearch.test.mjs supabase-document-ingest.test.mjs prismtrace.test.mjs"
   }
 }

@@ -31,3 +31,10 @@ npm run ingest -- ./documents
 The target bucket must already exist. The service-role key is required for
 server-side uploads and must never be exposed to browser code or committed.
 The command prints a JSON manifest of uploaded files and their Storage paths.
+
+## PRISM Live Tracing
+
+Set `PRISMTRACE_API_KEY`, `PRISMTRACE_PROJECT_ID`, and `PRISMTRACE_HOST` in the
+environment to trace Tavily searches and Supabase uploads. Set
+`PRISMTRACE_SESSION_ID` to group calls from one agent run. Trace delivery is
+best-effort and never prevents the underlying tool from completing.

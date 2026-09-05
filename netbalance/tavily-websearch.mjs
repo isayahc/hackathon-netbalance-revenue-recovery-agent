@@ -18,6 +18,7 @@ export async function tavilyWebSearch({
     throw new Error("TAVILY_API_KEY is not set");
   }
 
+  const startedAt = performance.now();
   const response = await fetch(TAVILY_ENDPOINT, {
     method: "POST",
     headers: {
