@@ -37,4 +37,6 @@ The command prints a JSON manifest of uploaded files and their Storage paths.
 Set `PRISMTRACE_API_KEY`, `PRISMTRACE_PROJECT_ID`, and `PRISMTRACE_HOST` in the
 environment to trace Tavily searches and Supabase uploads. Set
 `PRISMTRACE_SESSION_ID` to group calls from one agent run. Trace delivery is
-best-effort and never prevents the underlying tool from completing.
+best-effort and never prevents the underlying tool from completing. This uses
+Block Convey PRISM for AI failure detection and testing. Configure the values
+in `.env.local` or Vercel; never commit them.
