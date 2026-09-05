@@ -20,7 +20,10 @@ test("builds a PRISM trace with stable run identity and business metadata", () =
   assert.equal(payload.trace_id, "NB-10482-test-run:completion_evaluation");
   assert.equal(payload.agent_id, PRISM_AGENT_ID);
   assert.equal(payload.latency_ms, 17);
-  assert.equal(payload.metadata.case_id, "NB-10482");
+  assert.equal(payload.metadata.case_id, "ATLAS-42800");
+  assert.equal(payload.metadata.customer, "Atlas Cloud");
+  assert.equal(payload.metadata.incident, "grid power outage");
+  assert.equal(payload.metadata.scenario, "atlas_cloud_power_outage");
   assert.equal(payload.metadata.goal_amount, 42800);
   assert.equal(payload.metadata.business_goal_achieved, false);
   assert.equal(payload.metadata.recovered_amount, 0);

@@ -1,9 +1,12 @@
+import { atlasScenario } from "@/config/scenario";
+
 export const PRISM_AGENT_ID = "netbalance-revenue-recovery-agent";
 export const PRISM_MODEL = "deterministic-recovery-workflow-v1";
 
 export type PrismStage =
   | "document_ingestion"
   | "evidence_reconciliation"
+  | "evidence_verification"
   | "dispute_decision"
   | "claim_submission"
   | "retailer_response"
@@ -34,13 +37,11 @@ export function getPrismConfig(): PrismConfig | null {
 
 export function buildPrismTracePayload(event: PrismTraceEvent, projectId: string) {
   const metadata: Record<string, string | number | boolean> = {
-    case_id: "NB-10482",
-    retailer: "Northstar Retail",
-    invoice: "INV-10482",
-    po: "PO-77191",
-    distribution_center: "DC 027",
-    goal_amount: 42_800,
-    scenario: "multi_dc_shortage_deduction",
+    case_id: atlasScenario.caseId,
+    customer: atlasScenario.customer,
+    incident: atlasScenario.incident,
+    goal_amount: atlasScenario.deductionAmount,
+    scenario: atlasScenario.prismScenario,
     stage: event.stage,
     ...event.metadata,
   };
@@ -51,7 +52,7 @@ export function buildPrismTracePayload(event: PrismTraceEvent, projectId: string
     input_messages: [
       {
         role: "user",
-        content: `Recover $42,800 for case NB-10482. Execute stage: ${event.stage}.`,
+        content: `Recover $${atlasScenario.deductionAmount.toLocaleString()} for ${atlasScenario.customer} case ${atlasScenario.caseId}. Execute stage: ${event.stage}.`,
       },
     ],
     output_message: event.output,

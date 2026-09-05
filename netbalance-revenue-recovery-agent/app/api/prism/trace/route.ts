@@ -5,6 +5,7 @@ export const runtime = "nodejs";
 const allowedStages = new Set<PrismStage>([
   "document_ingestion",
   "evidence_reconciliation",
+  "evidence_verification",
   "dispute_decision",
   "claim_submission",
   "retailer_response",
