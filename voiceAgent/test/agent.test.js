@@ -6,8 +6,8 @@ import { createController } from '../src/controller.js';
 
 const financials = JSON.parse(await readFile(new URL('../data/sample-financials.json', import.meta.url), 'utf8'));
 const controllerResult = {
-  status: 'answered', answer: 'Cash fell $280,000 to $920,000.',
-  sourceIds: ['cash-net-change', 'cash-closing'], dataLabel: financials.dataLabel, period: financials.period,
+  status: 'answered', answer: financials.contextFacts.find((fact) => fact.sourceId === 'cash-down-explanation').note,
+  sourceIds: ['cash-down-explanation', 'receipt-delay', 'planned-receipts', 'planned-closing-cash'], dataLabel: financials.dataLabel, period: financials.period,
 };
 const toolCall = (id, question = 'Why is cash down?', name = 'consult_controller') => ({
   type: 'function_call', id: `fc_${id}`, call_id: id, name, arguments: JSON.stringify({ question }), status: 'completed',
@@ -39,7 +39,8 @@ test('a CFO request invokes the separate Controller and the next model request r
   ]);
   const controller = createController({ client, financials });
   const result = await createAgent({ client, controller }).respond({ question: 'Why is cash down this month?' });
-  assert.match(result.replyText, /sample data/);
+  assert.equal(result.replyText, 'Cash is down mainly because collections from a few enterprise customers are running behind. Three accounts explain most of the variance.');
+  assert.equal(result.history.at(-1).content[0].text, result.replyText);
   assert.equal(client.calls.length, 3);
   assert.deepEqual(client.calls[0].body.tool_choice, { type: 'function', name: 'consult_controller' });
   assert.equal(client.calls[1].body.text.format.name, 'controller_answer');
@@ -140,4 +141,38 @@ test('an unavailable-data Controller result is passed to the CFO as unavailable'
   const output = client.calls[1].body.input.find((item) => item.type === 'function_call_output');
   assert.equal(JSON.parse(output.output).status, 'insufficient_data');
   assert.match(result.replyText, /does not include net income/);
+});
+
+test('speech punctuation and capitalization retain exact demo wording and follow-ups remember what was spoken', async () => {
+  const client = queuedClient([
+    modelResponse([toolCall('one')]), reply('A model paraphrase that should not be spoken.'),
+    modelResponse([toolCall('two', 'Which three enterprise accounts are late?')]), reply('The sample labels are Enterprise Accounts A, B, and C.'),
+  ]);
+  const seenHistory = [];
+  const controller = {
+    cashDownReply: controllerResult.answer,
+    async consult({ history }) { seenHistory.push(structuredClone(history)); return controllerResult; },
+  };
+  const agent = createAgent({ client, controller });
+  const first = await agent.respond({ question: '  WHY is cash   down this month?!  ' });
+  assert.equal(first.replyText, controllerResult.answer);
+  const next = await agent.respond({ question: 'Which three accounts?', history: first.history });
+  assert.equal(seenHistory[1].at(-1).content[0].text, controllerResult.answer);
+  assert.equal(next.replyText, 'The sample labels are Enterprise Accounts A, B, and C.');
+  assert.ok(!JSON.stringify(next.history).includes('A model paraphrase'));
+});
+
+test('exact demo wording cannot override missing data, failed consultations, or another dataset', async () => {
+  const question = 'Why is cash down this month?';
+  const unavailable = { ...controllerResult, status: 'insufficient_data', answer: 'The sample data is unavailable.', sourceIds: [] };
+  const missingClient = queuedClient([modelResponse([toolCall('missing')]), reply(unavailable.answer)]);
+  const missing = await createAgent({ client: missingClient, controller: { cashDownReply: controllerResult.answer, async consult() { return unavailable; } } }).respond({ question });
+  assert.equal(missing.replyText, unavailable.answer);
+
+  const failedClient = queuedClient([modelResponse([toolCall('failed')])]);
+  await assert.rejects(createAgent({ client: failedClient, controller: { cashDownReply: controllerResult.answer, async consult() { throw new Error('Controller unavailable'); } } }).respond({ question }), /Controller unavailable/);
+
+  const otherClient = queuedClient([modelResponse([toolCall('other')]), reply('The sample data shows a different cause.')]);
+  const other = await createAgent({ client: otherClient, controller: { async consult() { return controllerResult; } } }).respond({ question });
+  assert.equal(other.replyText, 'The sample data shows a different cause.');
 });

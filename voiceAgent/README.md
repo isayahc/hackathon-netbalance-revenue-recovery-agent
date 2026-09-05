@@ -8,12 +8,14 @@ The Controller uses the fictional August 2026 data in `data/sample-financials.js
 
 1. Assistant: “Hello, I'm your AI finance assistant. This demo uses sample company data. What would you like to ask our AI Controller?”
 2. CFO: “Why is cash down this month?”
-3. Assistant, voiced by ElevenLabs: “Stay on the line. I will check with our Controller.”
+3. Assistant, voiced by ElevenLabs: “Stay on the line. I’ll check with our Controller.”
 4. The separate OpenAI Controller reviews the sample cash bridge while the caller stays on the line.
-5. Assistant: “Using the sample August data, cash fell $280,000, from $1.2 million to $920,000. Payments of $780,000 exceeded customer receipts of $500,000, including a one-time $120,000 equipment purchase.”
-6. The CFO can ask follow-up questions such as “What were the largest payments?” or “Was the equipment purchase recurring?” Say “goodbye” to end the call.
+5. Assistant: “Cash is down mainly because collections from a few enterprise customers are running behind. Three accounts explain most of the variance.”
+6. The CFO can ask follow-up questions such as “Which three accounts?” or “How much is delayed?” Say “goodbye” to end the call.
 
-Live wording and response time depend on the model and network. Missing facts are reported as unavailable. In this demo, “this month” means the dataset's August 2026 period.
+That cash-down question uses the exact approved reply after a successful Controller consultation; capitalization, repeated spaces, and trailing speech punctuation are ignored. The greeting discloses sample data, so the approved reply has no additional disclosure prefix. Other questions use model-generated wording, and missing facts are reported as unavailable. Response time depends on the model and network. In this demo, “this month” means the dataset's August 2026 period.
+
+The three fictional enterprise accounts have delayed payments of $80,000, $60,000, and $40,000. Together they explain the $180,000 shortfall against planned collections and planned closing cash. Actual cash still fell $280,000; the delayed amounts are not subtracted again from the cash bridge. The approved sentence is stored in the `cash-down-explanation` context fact. Removing that fact disables the fixed reply when replacing the sample dataset.
 
 ## Run the offline walkthrough
 
@@ -72,6 +74,8 @@ Copy `.env.example` to `.env` and fill in:
 | `ELEVENLABS_API_KEY` | ElevenLabs API access |
 | `ELEVENLABS_VOICE_ID` | The voice used for spoken replies |
 | `PUBLIC_BASE_URL` | Public HTTPS origin pointing to this server, e.g. an ngrok tunnel |
+| `PRISMTRACE_API_KEY`, `PRISMTRACE_PROJECT_ID` | Optional PRISM tracing credentials for both agents |
+| `PRISMTRACE_HOST` | Optional PRISM endpoint; defaults to the project's PRISM host |
 
 The default port is **3001**, so this project can run alongside the original server. Start a tunnel:
 
@@ -143,6 +147,7 @@ Greeting and holding audio are warmed at startup and cached. A cache miss may ta
 | `src/audio-store.js` | Temporary audio storage |
 | `src/call-store.js` | Call sessions, listening tokens, expiry, cancellation |
 | `src/config.js` | Environment configuration |
+| `src/prismtrace.js` | PRISM model timing/status traces, without conversation content |
 | `scripts/call.js` | Outbound call creation |
 | `scripts/demo.js` | Offline example conversation |
 
@@ -155,5 +160,6 @@ The sample opening cash plus actual cash movements must equal closing cash; the 
 - Webhook retries reuse turn tokens instead of launching duplicate model work. A terminal call-status callback cancels pending work. A failed or timed-out Controller turn leaves history unchanged and offers a retry.
 - No database or live financial connector is configured. Replace the Controller's data source when you have an approved source of company information. Caller identity verification would also need to be added before serving private company data.
 - OpenAI request storage is disabled with `store: false`; this setting does not itself define provider retention policies. The app does not enable Twilio call recording or write transcripts to disk.
+- When PRISM credentials are configured, both agents emit model role, model name, timing, and success/error metadata. Prompts, financial data, spoken answers, and provider error messages are excluded. Trace delivery runs in the background with a short timeout and does not block a phone response.
 
 Provider references: [OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling), [Twilio Gather](https://www.twilio.com/docs/voice/twiml/gather), [Twilio webhook signatures](https://www.twilio.com/docs/usage/tutorials/how-to-secure-your-express-app-by-validating-incoming-twilio-requests), [ElevenLabs speech API](https://elevenlabs.io/docs/api-reference/text-to-speech/convert).

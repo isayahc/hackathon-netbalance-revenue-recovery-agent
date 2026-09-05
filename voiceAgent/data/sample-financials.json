@@ -23,7 +23,21 @@
     {
       "sourceId": "receipt-delay",
       "amount": 180000,
-      "note": "A customer payment expected in August was delayed until September. It is excluded from August's $500,000 of actual receipts. This is a timing shortfall against expected receipts, not another cash outflow and not an additional deduction from the actual cash bridge. Its actual September collection is not confirmed."
+      "note": "Collections totaling $180,000 from three enterprise accounts expected in August are running behind: Enterprise Account A owes $80,000, Enterprise Account B owes $60,000, and Enterprise Account C owes $40,000. These are fictional account labels. Collections are now expected in September but are not confirmed. These amounts are excluded from August's $500,000 of actual receipts. They explain the $180,000 shortfall against planned receipts, not another cash outflow or an additional deduction from the actual cash bridge."
+    },
+    {
+      "sourceId": "planned-receipts",
+      "amount": 680000,
+      "note": "Planned August customer collections were $680,000. Actual receipts were $500,000. The three late enterprise accounts explain the entire $180,000 collections variance."
+    },
+    {
+      "sourceId": "planned-closing-cash",
+      "amount": 1100000,
+      "note": "Planned August closing cash was $1,100,000: opening cash of $1,200,000 plus planned collections of $680,000 less planned payments of $780,000. Actual payments matched the plan. Actual closing cash of $920,000 is $180,000 below plan. Without the collection delays, the month-over-month cash decline would have been $100,000 rather than $280,000."
+    },
+    {
+      "sourceId": "cash-down-explanation",
+      "note": "Cash is down mainly because collections from a few enterprise customers are running behind. Three accounts explain most of the variance."
     },
     {
       "sourceId": "equipment-one-time",
@@ -31,10 +45,10 @@
     }
   ],
   "unavailable": [
-    "Complete cash budget or planned closing cash",
+    "Detailed budget line items beyond the supplied collection and payment totals",
     "Other months' financial results or current live balances",
     "Revenue, net income, and a profit-and-loss statement",
-    "Customer identity and the exact delayed payment collection date",
+    "Real customer identities and exact delayed payment collection dates",
     "Invoice-level records, bank statements, debt, and credit facilities"
   ]
 }

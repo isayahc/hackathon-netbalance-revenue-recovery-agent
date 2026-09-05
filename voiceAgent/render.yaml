@@ -1,10 +1,10 @@
-# This Blueprint assumes voiceAgent is the repository root.
-# If deploying the parent repository, add rootDir: voiceAgent to this service.
+# Blueprint path: voiceAgent/render.yaml within the netbalance repository.
 # The paid instance below avoids idle spin-down during incoming phone calls.
 services:
   - type: web
     name: cfo-voice-agent
     runtime: node
+    rootDir: voiceAgent
     plan: 0.5c-512mb
     buildCommand: npm ci
     startCommand: npm start

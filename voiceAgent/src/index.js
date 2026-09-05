@@ -6,11 +6,12 @@ import { createSpeechService } from './speech.js';
 import { createController } from './controller.js';
 import { createAgent } from './agent.js';
 import { createApp, PROMPTS } from './app.js';
+import { withPrismTracing } from './prismtrace.js';
 
 async function main() {
   const config = loadConfig();
   requireConfig(config, ['openaiApiKey', 'twilioAuthToken', 'publicBaseUrl']);
-  const client = new OpenAI({ apiKey: config.openaiApiKey, maxRetries: 0, timeout: 15000 });
+  const client = withPrismTracing(new OpenAI({ apiKey: config.openaiApiKey, maxRetries: 0, timeout: 15000 }));
   const financials = JSON.parse(await readFile(new URL('../data/sample-financials.json', import.meta.url), 'utf8'));
   const controller = createController({ client, model: config.controllerModel, financials });
   const agent = createAgent({ client, model: config.openaiModel, controller });

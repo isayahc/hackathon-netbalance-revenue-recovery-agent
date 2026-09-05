@@ -28,6 +28,10 @@ test('the actual cash bridge reconciles without double counting context facts', 
     ['cash-net-change', -280_000], ['cash-total-inflows', 500_000], ['cash-total-outflows', 780_000],
   ]);
   assert.equal(financials.derivedFacts, undefined, 'validation does not mutate supplied data');
+  const contextAmount = (id) => result.contextFacts.find((fact) => fact.sourceId === id).amount;
+  assert.equal(contextAmount('planned-receipts') - 500_000, contextAmount('receipt-delay'));
+  assert.equal(contextAmount('planned-closing-cash') - result.closingCash.amount, contextAmount('receipt-delay'));
+  assert.equal(result.openingCash.amount + contextAmount('planned-receipts') - 780_000, contextAmount('planned-closing-cash'));
 });
 
 test('bad cash totals, duplicate sources, and imprecise amounts fail before an API call', () => {

@@ -42,6 +42,7 @@ export function createAgent({ client, model = 'gpt-5.4-mini', controller }) {
       if (!Array.isArray(history)) throw new Error('Conversation history must be an array.');
       const input = [...structuredClone(history), { role: 'user', content: question.trim() }];
       let consulted = false;
+      let controllerStatus;
       const maxToolRounds = 3;
 
       for (let round = 0; round <= maxToolRounds; round += 1) {
@@ -71,13 +72,22 @@ export function createAgent({ client, model = 'gpt-5.4-mini', controller }) {
           throw new Error('The CFO assistant did not return a complete response.');
         }
         // Keep every response item, including all calls, so subsequent requests retain a valid tool cycle.
+        const responseStart = input.length;
         input.push(...response.output);
         const calls = response.output.filter((item) => item.type === 'function_call');
         if (!calls.length) {
           if (!consulted) throw new Error('The CFO assistant answered without a successful Controller consultation.');
-          let replyText = readReply(response);
+          const isCashDownQuestion = question.trim().toLowerCase().replace(/[?!.]+$/u, '').trim().replace(/\s+/gu, ' ') === 'why is cash down this month';
+          const useDemoReply = isCashDownQuestion && controllerStatus === 'answered' && Boolean(controller.cashDownReply);
+          let replyText = useDemoReply ? controller.cashDownReply : readReply(response);
           if (!replyText || replyText.length > 1800) throw new Error('The CFO assistant returned an empty or overlong spoken reply.');
-          if (history.length === 0 && !/\b(sample|synthetic|demo)\b/i.test(replyText)) {
+          if (useDemoReply) {
+            // The phone greeting already discloses sample data. Preserve the exact
+            // approved wording, including in history used by follow-up questions.
+            input.splice(responseStart, response.output.length,
+              ...response.output.filter((item) => item.type !== 'message'),
+              { type: 'message', role: 'assistant', status: 'completed', content: [{ type: 'output_text', text: replyText, annotations: [] }] });
+          } else if (history.length === 0 && !/\b(sample|synthetic|demo)\b/i.test(replyText)) {
             const prefix = 'Using the synthetic demo data: ';
             // Keep the text actually spoken in the model history as well.
             for (const item of response.output) {
@@ -104,6 +114,7 @@ export function createAgent({ client, model = 'gpt-5.4-mini', controller }) {
               result = await controller.consult({ question: controllerQuestion, history, signal });
               assertNotAborted(signal);
               consulted = true;
+              controllerStatus = result.status;
             }
           }
           input.push({ type: 'function_call_output', call_id: call.call_id, output: JSON.stringify(result) });

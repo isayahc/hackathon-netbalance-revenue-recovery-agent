@@ -4,7 +4,7 @@ import { createCallStore } from './call-store.js';
 
 export const PROMPTS = {
   greeting: "Hello, I'm your AI finance assistant. This demo uses sample company data. What would you like to ask our AI Controller?",
-  hold: 'Stay on the line. I will check with our Controller.',
+  hold: 'Stay on the line. I’ll check with our Controller.',
   silence: "I didn't catch that. Please ask your question, or say goodbye to end the call.",
   problem: "I couldn't get a confirmed answer from the Controller just now. Please try your question again, or say goodbye.",
   goodbye: 'Thank you for calling. Goodbye.',

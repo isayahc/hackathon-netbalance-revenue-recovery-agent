@@ -1,17 +1,16 @@
 import { readFile } from 'node:fs/promises';
 import { createAgent } from '../src/agent.js';
 import { createController, reconcileFinancials } from '../src/controller.js';
+import { PROMPTS } from '../src/app.js';
 
 // A deterministic, explicitly offline walkthrough of the real orchestration code.
 // This fake SDK never contacts OpenAI, ElevenLabs, Twilio, or any other service.
 const financials = JSON.parse(await readFile(new URL('../data/sample-financials.json', import.meta.url), 'utf8'));
-const reconciled = reconcileFinancials(financials);
-const dollars = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
-const fact = (id) => reconciled.derivedFacts.find((entry) => entry.sourceId === id).amount;
-const answer = `Using the sample August data, cash fell ${dollars(-fact('cash-net-change'))}, from ${dollars(financials.openingCash.amount)} to ${dollars(financials.closingCash.amount)}. Payments of ${dollars(fact('cash-total-outflows'))} exceeded customer receipts of ${dollars(fact('cash-total-inflows'))}, including a one-time ${dollars(-financials.movements.find((entry) => entry.sourceId === 'cash-equipment').amount)} equipment purchase.`;
+reconcileFinancials(financials);
+const answer = financials.contextFacts.find((entry) => entry.sourceId === 'cash-down-explanation').note;
 const controllerResult = {
   status: 'answered', answer,
-  sourceIds: ['cash-net-change', 'cash-opening', 'cash-closing', 'cash-total-inflows', 'cash-total-outflows', 'cash-equipment', 'equipment-one-time'],
+  sourceIds: ['cash-down-explanation', 'receipt-delay', 'planned-receipts', 'planned-closing-cash'],
 };
 let requests = 0;
 const client = {
@@ -38,7 +37,7 @@ const client = {
 
 console.log('OFFLINE SIMULATION: scripted model responses; no audio, API requests, or phone calls.\n');
 console.log('CFO: Why is cash down this month?');
-console.log('Assistant: Stay on the line. I will check with our Controller.');
+console.log(`Assistant: ${PROMPTS.hold}`);
 const controller = createController({ client, financials });
 const agent = createAgent({ client, controller });
 const result = await agent.respond({ question: 'Why is cash down this month?' });
