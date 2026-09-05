@@ -10,7 +10,7 @@
 This project sends traces to PRISM. Env vars: `PRISMTRACE_API_KEY`,
 `PRISMTRACE_PROJECT_ID`, `PRISMTRACE_HOST`.
 
-Tracing is currently wired at: `netbalance/tavily-websearch.mjs`, `netbalance/supabase-document-ingest.mjs`
+Tracing is currently wired at: `netbalance/tavily-websearch.mjs`, `netbalance/supabase-document-ingest.mjs`, `netbalance-revenue-recovery-agent/lib/prism/index.ts`, `netbalance-revenue-recovery-agent/app/recovery-runner.tsx`
 
 **Standing rule.** Whenever you add or change an agent, chain, graph, tool,
 retriever, or any entry point that calls a model, wire it to PRISM before you
