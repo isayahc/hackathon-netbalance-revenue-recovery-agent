@@ -16,3 +16,18 @@ search results. Agents can also import `tavilyWebSearch` from
 `./tavily-websearch.mjs`.
 
 Run the local tests with `npm test`.
+
+## Supabase Document Ingestion
+
+The ingestion CLI uploads every file under a local directory to a Supabase
+Storage bucket, preserving its relative directory structure. Configure
+`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and optionally
+`SUPABASE_STORAGE_BUCKET` using `.env.example`, then run:
+
+```bash
+npm run ingest -- ./documents
+```
+
+The target bucket must already exist. The service-role key is required for
+server-side uploads and must never be exposed to browser code or committed.
+The command prints a JSON manifest of uploaded files and their Storage paths.
