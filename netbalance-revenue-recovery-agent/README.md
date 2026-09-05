@@ -339,6 +339,18 @@ Baseline: stop at technical success ($0 recovered)
 Improved: answer evidence request → approval → verify settlement ($42,800 recovered)
 ```
 
+## E2E smoke test
+
+Start the app, then run the HTTP smoke test from another terminal:
+
+```bash
+npm run dev -- --port 3010
+E2E_BASE_URL=http://localhost:3010 npm run e2e
+```
+
+The test covers the Atlas case page, analysis, both PRISM evidence-gate states,
+claim submission, follow-up evidence, approval, and settlement verification.
+
 ## 8. Safety and event rules
 
 - Use only the synthetic documents and fictional financial data included here.
