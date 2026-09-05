@@ -1,0 +1,9 @@
+{
+  "name": "netbalance-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "search": "node tavily-websearch.mjs",
+    "test": "node --test tavily-websearch.test.mjs"
+  }
+}
