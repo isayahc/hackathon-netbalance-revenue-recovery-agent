@@ -24,7 +24,6 @@ type RunEvent = {
 };
 
 type RecoveryRunnerProps = {
-  initialAnalysis: RecoveryAnalysis;
   completionCondition: CompletionCondition;
   targetRecoveryAmount: number;
 };
@@ -50,7 +49,7 @@ async function jsonRequest<T>(url: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
-export function RecoveryRunner({ initialAnalysis, completionCondition, targetRecoveryAmount }: RecoveryRunnerProps) {
+export function RecoveryRunner({ completionCondition, targetRecoveryAmount }: RecoveryRunnerProps) {
   const [events, setEvents] = useState<RunEvent[]>([]);
   const [state, setState] = useState<"ready" | "running" | "complete" | "error">("ready");
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -171,7 +170,7 @@ export function RecoveryRunner({ initialAnalysis, completionCondition, targetRec
         signal: controller.signal,
       });
       append({ id: "claim-submitted", label: "Claim submitted", detail: `${claim.claim_id} · $${claim.amount.toLocaleString()}`, status: "passed" });
-      await trace("claim_submission", `Northstar accepted claim ${claim.claim_id} for $${claim.amount.toLocaleString()}.`, { claim_id: claim.claim_id, http_success: true });
+       await trace("claim_submission", `Atlas Cloud accepted claim ${claim.claim_id} for $${claim.amount.toLocaleString()}.`, { claim_id: claim.claim_id, http_success: true });
       await wait(controller.signal);
 
       const submissionCompletion = evaluateCompletion(
@@ -193,27 +192,27 @@ export function RecoveryRunner({ initialAnalysis, completionCondition, targetRec
       }
 
       const review = await jsonRequest<{ status: string; request: string }>(`/api/northstar/claims/${claim.claim_id}`, { signal: controller.signal });
-      append({ id: "additional-request", label: "Northstar requested additional evidence", detail: review.request, status: "info" });
-      await trace("retailer_response", `Northstar status: ${review.status}. ${review.request}`, { retailer_status: review.status });
+       append({ id: "additional-request", label: "Atlas Cloud requested additional evidence", detail: review.request, status: "info" });
+       await trace("retailer_response", `Atlas Cloud status: ${review.status}. ${review.request}`, { retailer_status: review.status });
       await wait(controller.signal);
 
       await jsonRequest(`/api/northstar/claims/${claim.claim_id}/evidence`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          document: "Proof_of_Delivery_DC027.pdf",
-          seal_number: initialAnalysis.claimPackage?.evidenceReferences.includes("Proof_of_Delivery_DC027.pdf") ? "S-44719" : "",
-          signed_by: "Northstar Receiving",
-          receiver: "J. Reynolds",
+          body: JSON.stringify({
+          document: "Power_Failover_Report.pdf",
+          failover_status: "Backup power activated",
+          service_status: "Operational",
+          sla_breached: false,
         }),
         signal: controller.signal,
       });
-      append({ id: "additional-evidence", label: "Additional evidence submitted", detail: "Signed POD, receiver J. Reynolds, and seal S-44719 confirmed.", status: "passed" });
-      await trace("additional_evidence_response", "Submitted signed POD, receiver J. Reynolds, and intact seal S-44719.", { seal_number: "S-44719", evidence_verified: true });
+       append({ id: "additional-evidence", label: "Power failover report submitted", detail: "Backup power activation, operational service, and no SLA breach confirmed.", status: "passed" });
+       await trace("additional_evidence_response", "Submitted the Power failover report; backup power activated and service remained operational.", { evidence_verified: true, sla_breached: false });
       await wait(controller.signal);
 
       const approval = await jsonRequest<{ status: string; approved_amount: number }>(`/api/northstar/claims/${claim.claim_id}?evidence_submitted=true`, { signal: controller.signal });
-      append({ id: "claim-approved", label: "Northstar approved claim", detail: `$${approval.approved_amount.toLocaleString()} approved.`, status: "passed" });
+       append({ id: "claim-approved", label: "Atlas Cloud approved claim", detail: `$${approval.approved_amount.toLocaleString()} approved.`, status: "passed" });
       await wait(controller.signal);
 
       const settlement = await jsonRequest<{ status: string; amount: number; reference: string }>(`/api/northstar/claims/${claim.claim_id}/settlement`, { signal: controller.signal });
@@ -282,7 +281,7 @@ export function RecoveryRunner({ initialAnalysis, completionCondition, targetRec
             <span>{outcome === "technical-only" ? "Outcome not verified" : "Outcome verified"}</span>
             <h3>{outcome === "technical-only" ? "Business goal not achieved" : "Revenue recovered"}</h3>
             <strong className="outcome-amount">{outcome === "technical-only" ? "$0 recovered" : `$${targetRecoveryAmount.toLocaleString()} recovered`}</strong>
-            <p>{outcome === "technical-only" ? "The claim was submitted, but the agent stopped before retailer approval." : "Northstar approved the claim and the target amount matches."}</p>
+             <p>{outcome === "technical-only" ? "The claim was submitted, but the agent stopped before customer approval." : "Atlas Cloud approved the claim and the target amount matches."}</p>
           </section>
         )}
       </aside>

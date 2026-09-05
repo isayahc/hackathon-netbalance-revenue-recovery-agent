@@ -1,10 +1,10 @@
 # Netbalance Revenue Recovery Agent
 
-A deterministic hackathon demo of an AI agent investigating and recovering a fictional **$42,800 retail shortage deduction**. The agent reads eight synthetic PDFs, reconciles conflicting shipment records, builds a claim, interacts with a mock retailer API, responds to a request for more evidence, and verifies the final settlement.
+A deterministic hackathon demo of an AI agent investigating a fictional **$42,800 Atlas Cloud power-service deduction**. The agent reads synthetic outage evidence, verifies a missing Power failover report through PRISM, builds a claim, interacts with a mock customer API, and verifies the final settlement.
 
 This README is the complete operator runbook. If you are opening the project for the first time, follow the sections in order.
 
-> **Synthetic data only:** Northstar Retail, its records, and every financial value in this repository are fictional and intended only for demonstration.
+> **Synthetic data only:** Atlas Cloud, its records, and every financial value in this repository are fictional and intended only for demonstration.
 
 ## What the demo proves
 
@@ -21,11 +21,11 @@ The repository is currently configured as shown in [`config/demo.ts`](config/dem
 
 ## Demo scenario
 
-- Case: `NB-10482`
-- Retailer: Northstar Retail
+- Case: `ATLAS-42800`
+- Customer: Atlas Cloud
 - Invoice: `INV-10482`
 - Purchase order: `PO-77191`
-- Distribution center: `DC 027`, Atlanta
+- Incident: grid power outage, Atlanta
 - Invoice amount: `$268,000`
 - Payment received: `$225,200`
 - Deduction to recover: `$42,800`
@@ -44,7 +44,7 @@ The repository is currently configured as shown in [`config/demo.ts`](config/dem
 | [`config/demo.ts`](config/demo.ts) | The one-value hackathon completion-condition switch |
 | [`lib/document-ingestion`](lib/document-ingestion) | PDF extraction, normalization, provenance, and validation |
 | [`lib/agent`](lib/agent) | Reconciliation, eligibility reasoning, claim assembly, and completion evaluation |
-| [`lib/northstar`](lib/northstar) | Deterministic fictional retailer service |
+| [`lib/northstar`](lib/northstar) | Deterministic fictional Atlas Cloud customer service |
 | [`lib/prism`](lib/prism) | Optional PRISM trace delivery |
 | [`public/evidence`](public/evidence) | The eight synthetic source PDFs |
 | [`tests`](tests) | Tests for ingestion, reasoning, completion, PRISM, and Northstar behavior |

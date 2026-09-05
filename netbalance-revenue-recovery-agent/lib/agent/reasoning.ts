@@ -77,7 +77,7 @@ export function classifyDeduction(
   evidence: NormalizedCaseEvidence,
   reconciliation: ShipmentReconciliation,
 ): "potentially_invalid_shortage" | "needs_review" {
-  return evidence.deduction_reason === "Merchandise Shortage" && reconciliation.conflictIdentified
+  return evidence.deduction_reason === "Power Service Interruption" && reconciliation.conflictIdentified
     ? "potentially_invalid_shortage"
     : "needs_review";
 }
@@ -176,7 +176,7 @@ export function analyzeRecoveryCase(evidence: NormalizedCaseEvidence, claimAgeDa
       id: "distribution-center",
       label: "Deduction localized",
       detail: `${analysis.affectedDistributionCenter} - Atlanta is identified on the remittance advice.`,
-      status: passed(analysis.affectedDistributionCenter === "DC 027"),
+      status: passed(analysis.affectedDistributionCenter === "Atlas Cloud"),
       sourceFields: ["deduction_dc"],
     },
     {
@@ -202,7 +202,7 @@ export function analyzeRecoveryCase(evidence: NormalizedCaseEvidence, claimAgeDa
     },
     {
       id: "policy",
-      label: "Northstar policy checked",
+      label: "Atlas Cloud SLA policy checked",
       detail: `Claim age ${policy.claimAgeDays} days; policy allows disputes within ${policy.disputeWindowDays} days.`,
       status: passed(policy.withinWindow),
       sourceFields: ["dispute_window_days"],

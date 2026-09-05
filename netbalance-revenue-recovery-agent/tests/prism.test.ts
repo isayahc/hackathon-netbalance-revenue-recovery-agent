@@ -6,7 +6,7 @@ import { buildPrismTracePayload, PRISM_AGENT_ID } from "../lib/prism/index";
 test("builds a PRISM trace with stable run identity and business metadata", () => {
   const payload = buildPrismTracePayload(
     {
-      sessionId: "NB-10482-test-run",
+      sessionId: "ATLAS-42800-test-run",
       stage: "completion_evaluation",
       output: "Technical success; business goal not achieved.",
       latencyMs: 17,
@@ -16,8 +16,8 @@ test("builds a PRISM trace with stable run identity and business metadata", () =
   );
 
   assert.equal(payload.project_id, "project-id");
-  assert.equal(payload.session_id, "NB-10482-test-run");
-  assert.equal(payload.trace_id, "NB-10482-test-run:completion_evaluation");
+  assert.equal(payload.session_id, "ATLAS-42800-test-run");
+  assert.equal(payload.trace_id, "ATLAS-42800-test-run:completion_evaluation");
   assert.equal(payload.agent_id, PRISM_AGENT_ID);
   assert.equal(payload.latency_ms, 17);
   assert.equal(payload.metadata.case_id, "ATLAS-42800");

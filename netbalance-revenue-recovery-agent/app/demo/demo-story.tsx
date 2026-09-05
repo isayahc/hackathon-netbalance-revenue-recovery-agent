@@ -33,7 +33,7 @@ const scenes = [
 
 const activity = [
   ["Remittance PDF parsed", "Payment matched to INV-10482", "Short payment detected: $42,800"],
-  ["Case NB-10482 created", "Northstar Retail identified", "Recovery target set to $42,800"],
+  ["Case ATLAS-42800 created", "Atlas Cloud identified", "Recovery target set to $42,800"],
   ["Reading remittance advice", "Matching invoice and payment", "Retrieving shipment evidence", "Analyzing receiving report…"],
   ["Invoice confirms 1,460 cases", "ASN confirms 1,460 cases", "Signed POD confirms delivery", "Receiving report lists only 1,220"],
   ["Policy window confirmed", "Five supporting files attached", "Claim NS-CL-88921 submitted"],

@@ -1,5 +1,5 @@
-export const NORTHSTAR_CLAIM_ID = "NS-CL-88921";
-export const NORTHSTAR_CREDIT_REFERENCE = "NS-CR-77182";
+export const NORTHSTAR_CLAIM_ID = "AT-CL-88921";
+export const NORTHSTAR_CREDIT_REFERENCE = "AT-CR-77182";
 
 export type ClaimSubmission = {
   case_id: string;
@@ -11,9 +11,9 @@ export type ClaimSubmission = {
 
 export type EvidenceSubmission = {
   document: string;
-  seal_number: string;
-  signed_by: string;
-  receiver: string;
+  failover_status: string;
+  service_status: string;
+  sla_breached: boolean;
 };
 
 export class MockNorthstarError extends Error {
@@ -31,7 +31,7 @@ export function createClaim(input: unknown) {
   if (!isRecord(input)) throw new MockNorthstarError("A claim payload is required.");
 
   const required = {
-    case_id: "NB-10482",
+     case_id: "ATLAS-42800",
     invoice: "INV-10482",
     po: "PO-77191",
     deduction_amount: 42800,
@@ -60,7 +60,7 @@ export function reviewClaim(claimId: string, additionalEvidenceSubmitted: boolea
     return {
       claim_id: NORTHSTAR_CLAIM_ID,
       status: "additional_documentation_required" as const,
-      request: "Confirm signed proof of delivery and seal number for DC 027.",
+       request: "Confirm the Power failover report and SLA status for Atlas Cloud.",
     };
   }
 
@@ -76,10 +76,10 @@ export function submitAdditionalEvidence(claimId: string, input: unknown) {
   if (!isRecord(input)) throw new MockNorthstarError("An evidence payload is required.");
 
   const expected = {
-    document: "Proof_of_Delivery_DC027.pdf",
-    seal_number: "S-44719",
-    signed_by: "Northstar Receiving",
-    receiver: "J. Reynolds",
+    document: "Power_Failover_Report.pdf",
+    failover_status: "Backup power activated",
+    service_status: "Operational",
+    sla_breached: false,
   } as const;
 
   for (const [field, value] of Object.entries(expected)) {
@@ -92,7 +92,7 @@ export function submitAdditionalEvidence(claimId: string, input: unknown) {
     claim_id: NORTHSTAR_CLAIM_ID,
     status: "additional_documentation_received" as const,
     evidence_verified: true,
-    seal_number: "S-44719",
+    failover_status: "Backup power activated",
   };
 }
 
