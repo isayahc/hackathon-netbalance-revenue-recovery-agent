@@ -39,7 +39,7 @@ export function verifyEvidence(input: EvidenceVerificationInput): EvidenceVerifi
     };
   }
 
-  const failover = input.powerFailoverReport;
+  const failover = input.powerFailoverReport!;
   const supportsInvalidDeduction =
     input.caseId === atlasScenario.caseId &&
     input.customer === atlasScenario.customer &&
